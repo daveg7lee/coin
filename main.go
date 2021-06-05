@@ -2,14 +2,25 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
+
+	"github.com/daveg7lee/kangaroocoin/blockchain"
 )
 
 const port string = ":4000"
 
+type homeData struct {
+	PageTitle string
+	Blocks    []*blockchain.Block
+}
+
 func handleHome(rw http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(rw, "Hello from home")
+	tmpl := template.Must(template.ParseFiles("templates/home.html"))
+	blocks := blockchain.GetBlockchain().AllBlocks()
+	data := homeData{"Home", blocks}
+	tmpl.Execute(rw, data)
 }
 
 func main() {
