@@ -2,17 +2,18 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/daveg7lee/kangaroocoin/blockchain"
+	"log"
+	"net/http"
 )
 
+const port string = ":4000"
+
+func handleHome(rw http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(rw, "Hello from home")
+}
+
 func main() {
-	chain := blockchain.GetBlockchain()
-	chain.AddBlock("Second Block")
-	blocks := chain.AllBlocks()
-	for _, block := range blocks {
-		fmt.Printf("Data: %s\n", block.Data)
-		fmt.Printf("Hash: %s\n", block.Hash)
-		fmt.Printf("Prev Hash: %s\n", block.PrevHash)
-	}
+	http.HandleFunc("/", handleHome)
+	fmt.Printf("Listening on http://localhost%s\n", port)
+	log.Fatal(http.ListenAndServe(port, nil))
 }
