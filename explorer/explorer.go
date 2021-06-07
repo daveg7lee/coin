@@ -9,6 +9,7 @@ import (
 	"github.com/daveg7lee/kangaroocoin/blockchain"
 )
 
+// data struct to send data to page
 type homeData struct {
 	PageTitle string
 	Blocks    []*blockchain.Block
@@ -21,12 +22,17 @@ const (
 
 var templates *template.Template
 
+// handle '/'
 func handleHome(rw http.ResponseWriter, r *http.Request) {
+	// get all blocks
 	blocks := blockchain.GetBlockchain().AllBlocks()
+	// make data
 	data := homeData{"Home", blocks}
+	// execute template "home" with data
 	templates.ExecuteTemplate(rw, "home", data)
 }
 
+// handle '/add'
 func handleAdd(rw http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "POST":

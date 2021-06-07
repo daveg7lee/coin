@@ -5,33 +5,45 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
-	"github.com/daveg7lee/kangaroocoin/utils"
 )
 
+// port number
 const port string = ":4000"
 
+// Struct to make description of routes
 type URLDescription struct {
-	URL         string
-	Method      string
-	Description string
+	URL         string `json:"url"`
+	Method      string `json:"method"`
+	Description string `json:"description"`
+	Payload     string `json:"payload,omitempty"`
 }
 
+// handle '/' route
 func documentation(rw http.ResponseWriter, r *http.Request) {
+	// make description of route '/'
 	data := []URLDescription{
 		{
 			URL:         "/",
 			Method:      "GET",
 			Description: "See Documentation",
 		},
+		{
+			URL:         "/blocks",
+			Method:      "POST",
+			Description: "Add a Block",
+			Payload:     "data:string",
+		},
 	}
-	b, err := json.Marshal(data)
-	utils.HandleErr(err)
-	rw.Write(b)
+	// add content-type to header
+	rw.Header().Add("Content-Type", "application/json")
+	// encode data to JSON and write to response
+	json.NewEncoder(rw).Encode(data)
 }
 
 func main() {
+	// handle route
 	http.HandleFunc("/", documentation)
 	fmt.Printf("Server running on http://localhost%s\n", port)
+	// run server
 	log.Fatal(http.ListenAndServe(port, nil))
 }
