@@ -8,9 +8,9 @@ import (
 
 // block struct
 type Block struct {
-	Data     string
-	Hash     string
-	PrevHash string
+	Data     string `json:"data"`
+	Hash     string `json:"hash"`
+	PrevHash string `json:"prevHash,omitempty"`
 }
 
 // blockchain struct
