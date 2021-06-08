@@ -43,7 +43,7 @@ func documentation(rw http.ResponseWriter, r *http.Request) {
 func main() {
 	// handle route
 	http.HandleFunc("/", documentation)
-	fmt.Printf("Server running on http://localhost%s\n", port)
 	// run server
 	log.Fatal(http.ListenAndServe(port, nil))
+	fmt.Printf("Server running on http://localhost%s\n", port)
 }
