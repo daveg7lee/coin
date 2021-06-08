@@ -58,6 +58,6 @@ func Start() {
 	http.HandleFunc("/", handleHome)
 	http.HandleFunc("/add", handleAdd)
 	// run server
-	log.Fatal(http.ListenAndServe(port, nil))
 	fmt.Printf("Listening on http://localhost%s\n", port)
+	log.Fatal(http.ListenAndServe(port, nil))
 }
