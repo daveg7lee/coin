@@ -8,6 +8,7 @@ import (
 
 	"github.com/daveg7lee/kangaroocoin/blockchain"
 	"github.com/daveg7lee/kangaroocoin/utils"
+	"github.com/gorilla/mux"
 )
 
 var port string
@@ -85,15 +86,22 @@ func blocks(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func block(rw http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	fmt.Println(id)
+}
+
 func Start(portNum int) {
 	// make own handler
-	handler := http.NewServeMux()
+	router := mux.NewRouter()
 	// init port number
 	port = fmt.Sprintf(":%d", portNum)
 	// handle routes
-	handler.HandleFunc("/", documentation)
-	handler.HandleFunc("/blocks", blocks)
+	router.HandleFunc("/", documentation).Methods("GET")
+	router.HandleFunc("/blocks", blocks).Methods("GET", "POST")
+	router.HandleFunc("/blocks/{id:[0-9]+}", block).Methods("GET")
 	// run server
 	fmt.Printf("Listening on http://localhost%s\n", port)
-	log.Fatal(http.ListenAndServe(port, handler))
+	log.Fatal(http.ListenAndServe(port, router))
 }
