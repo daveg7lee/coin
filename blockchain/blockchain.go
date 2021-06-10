@@ -32,18 +32,18 @@ func (b *Block) calculateHash() {
 
 func getLastHash() string {
 	// get length of blockchain
-	totalBlocks := len(GetBlockchain().blocks)
+	totalBlocks := len(Blockchain().blocks)
 	// return nothing when block is genesis block
 	if totalBlocks == 0 {
 		return ""
 	}
 	// return last block's hash
-	return GetBlockchain().blocks[totalBlocks-1].Hash
+	return Blockchain().blocks[totalBlocks-1].Hash
 }
 
 func createBlock(data string) *Block {
 	// make new block
-	newBlock := Block{data, "", getLastHash(), len(GetBlockchain().blocks) + 1}
+	newBlock := Block{data, "", getLastHash(), len(Blockchain().blocks) + 1}
 	// calculate Hash
 	newBlock.calculateHash()
 	// return block
@@ -55,7 +55,7 @@ func (b *blockchain) AddBlock(data string) {
 	b.blocks = append(b.blocks, createBlock(data))
 }
 
-func GetBlockchain() *blockchain {
+func Blockchain() *blockchain {
 	// check blockchain is not nil
 	if b == nil {
 		// create blockchain but it occur only once
