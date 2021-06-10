@@ -119,6 +119,6 @@ func Start(portNum int) {
 	router.HandleFunc("/blocks", blocks).Methods("GET", "POST")
 	router.HandleFunc("/blocks/{height:[0-9]+}", block).Methods("GET")
 	// run server
-	fmt.Printf("Listening on http://localhost%s\n", port)
+	fmt.Printf("REST API is Listening on http://localhost%s\n", port)
 	log.Fatal(http.ListenAndServe(port, router))
 }
