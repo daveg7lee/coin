@@ -2,6 +2,9 @@ package blockchain
 
 import (
 	"sync"
+
+	"github.com/daveg7lee/kangaroocoin/db"
+	"github.com/daveg7lee/kangaroocoin/utils"
 )
 
 // blockchain struct
@@ -13,10 +16,15 @@ type blockchain struct {
 var b *blockchain
 var once sync.Once
 
+func (b *blockchain) persist() {
+	db.SaveBlockchain(utils.ToBytes(b))
+}
+
 func (b *blockchain) AddBlock(data string) {
-	block := createBlock(data, b.NewestHash, b.Height)
+	block := createBlock(data, b.NewestHash, b.Height+1)
 	b.NewestHash = block.Hash
 	b.Height = block.Height
+	b.persist()
 }
 
 func Blockchain() *blockchain {
