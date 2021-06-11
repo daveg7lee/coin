@@ -73,7 +73,7 @@ func blocks(rw http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
 		// encode blocks' data to json
-		json.NewEncoder(rw).Encode(blockchain.Blockchain().AllBlocks())
+		json.NewEncoder(rw).Encode(blockchain.Blockchain().Blocks())
 	case "POST":
 		// make var to store data from user
 		var addBlockBody addBlockBody

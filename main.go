@@ -1,9 +1,11 @@
 package main
 
 import (
-	"github.com/daveg7lee/kangaroocoin/blockchain"
+	"github.com/daveg7lee/kangaroocoin/cli"
+	"github.com/daveg7lee/kangaroocoin/db"
 )
 
 func main() {
-	blockchain.Blockchain()
+	defer db.Close()
+	cli.Start()
 }
