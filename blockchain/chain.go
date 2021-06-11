@@ -1,6 +1,9 @@
 package blockchain
 
 import (
+	"bytes"
+	"encoding/gob"
+	"fmt"
 	"sync"
 
 	"github.com/daveg7lee/kangaroocoin/db"
@@ -15,6 +18,11 @@ type blockchain struct {
 
 var b *blockchain
 var once sync.Once
+
+func (b *blockchain) restore(data []byte) {
+	decoder := gob.NewDecoder(bytes.NewReader(data))
+	utils.HandleErr(decoder.Decode(b))
+}
 
 func (b *blockchain) persist() {
 	db.SaveBlockchain(utils.ToBytes(b))
@@ -31,9 +39,17 @@ func Blockchain() *blockchain {
 	// check blockchain is not nil
 	if b == nil {
 		// create blockchain but it occur only once
-		once.Do(func() { b = &blockchain{"", 0} })
-		// add genesis block
-		b.AddBlock("Genesis Block!!")
+		once.Do(func() {
+			b = &blockchain{"", 0}
+			checkPoint := db.CheckPoint()
+			if checkPoint == nil {
+				// add genesis block
+				b.AddBlock("Genesis Block!!")
+			} else {
+				fmt.Println("Restoring...")
+				b.restore(checkPoint)
+			}
+		})
 	}
 	// return blockchain
 	return b
