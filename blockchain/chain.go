@@ -7,10 +7,16 @@ import (
 	"github.com/daveg7lee/kangaroocoin/utils"
 )
 
+const (
+	defaultDifficulty  int = 2
+	difficultyInterval int = 5
+)
+
 // blockchain struct
 type blockchain struct {
-	NewestHash string `json:"newestHash"`
-	Height     int    `json:"height"`
+	NewestHash        string `json:"newestHash"`
+	Height            int    `json:"height"`
+	CurrentDifficulty int    `json:"currentDifficulty"`
 }
 
 var b *blockchain
@@ -46,12 +52,24 @@ func (b *blockchain) Blocks() []*Block {
 	return blocks
 }
 
+func (b *blockchain) difficulty() int {
+	if b.Height == 0 {
+		return defaultDifficulty
+	} else if b.Height%difficultyInterval == 0 {
+		// calculate difficulty
+	} else {
+		return b.CurrentDifficulty
+	}
+}
+
 func Blockchain() *blockchain {
 	// check blockchain is not nil
 	if b == nil {
 		// create blockchain but it occur only once
 		once.Do(func() {
-			b = &blockchain{"", 0}
+			b = &blockchain{
+				Height: 0,
+			}
 			checkPoint := db.CheckPoint()
 			if checkPoint == nil {
 				// add genesis block
