@@ -9,12 +9,16 @@ import (
 	"github.com/daveg7lee/kangaroocoin/utils"
 )
 
+const difficulty int = 2
+
 // block struct
 type Block struct {
-	Data     string `json:"data"`
-	Hash     string `json:"hash"`
-	PrevHash string `json:"prevHash,omitempty"`
-	Height   int    `json:"height"`
+	Data       string `json:"data"`
+	Hash       string `json:"hash"`
+	PrevHash   string `json:"prevHash,omitempty"`
+	Height     int    `json:"height"`
+	Difficulty int    `json:"difficulty"`
+	Nonce      int    `json:"nonce"`
 }
 
 var ErrNotFound = errors.New("Block not found")
