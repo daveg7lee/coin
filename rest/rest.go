@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/daveg7lee/kangaroocoin/blockchain"
+	"github.com/daveg7lee/kangaroocoin/utils"
 	"github.com/gorilla/mux"
 )
 
@@ -33,6 +34,11 @@ type errorResponse struct {
 	ErrorMessage string `json:"errorMessage"`
 }
 
+type balanceResponse struct {
+	Address string `json:"address"`
+	Amount  int    `json:"amount"`
+}
+
 // handle '/' route
 func documentation(rw http.ResponseWriter, r *http.Request) {
 	// make description of route '/'
@@ -46,6 +52,11 @@ func documentation(rw http.ResponseWriter, r *http.Request) {
 			URL:         url("/status"),
 			Method:      "GET",
 			Description: "See the Status of the Blockchain",
+		},
+		{
+			URL:         url("/balance/{address}"),
+			Method:      "GET",
+			Description: "See the Balance of the Address",
 		},
 		{
 			URL:         url("/blocks"),
@@ -96,6 +107,19 @@ func status(rw http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(rw).Encode(blockchain.Blockchain())
 }
 
+func balance(rw http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	address := vars["address"]
+	total := r.URL.Query().Get("total")
+	switch total {
+	case "true":
+		amount := blockchain.Blockchain().BalanceByAddress(address)
+		utils.HandleErr(json.NewEncoder(rw).Encode(balanceResponse{address, amount}))
+	default:
+		utils.HandleErr(json.NewEncoder(rw).Encode(blockchain.Blockchain().TxOutsByAddress(address)))
+	}
+}
+
 func jsonContentTypeMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		rw.Header().Add("Content-Type", "application/json")
@@ -113,6 +137,7 @@ func Start(portNum int) {
 	// handle routes
 	router.HandleFunc("/", documentation).Methods("GET")
 	router.HandleFunc("/status", status).Methods("GET")
+	router.HandleFunc("/balance/{address}", balance).Methods("GET")
 	router.HandleFunc("/blocks", blocks).Methods("GET", "POST")
 	router.HandleFunc("/blocks/{hash:[a-f0-9]+}", block).Methods("GET")
 	// run server
