@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"github.com/daveg7lee/kangaroocoin/blockchain"
-	"github.com/daveg7lee/kangaroocoin/utils"
 	"github.com/gorilla/mux"
 )
 
@@ -30,10 +29,6 @@ type urlDescription struct {
 	Payload     string `json:"payload,omitempty"`
 }
 
-type addBlockBody struct {
-	Data string
-}
-
 type errorResponse struct {
 	ErrorMessage string `json:"errorMessage"`
 }
@@ -46,6 +41,11 @@ func documentation(rw http.ResponseWriter, r *http.Request) {
 			URL:         url("/"),
 			Method:      "GET",
 			Description: "See Documentation",
+		},
+		{
+			URL:         url("/status"),
+			Method:      "GET",
+			Description: "See the Status of the Blockchain",
 		},
 		{
 			URL:         url("/blocks"),
@@ -75,13 +75,7 @@ func blocks(rw http.ResponseWriter, r *http.Request) {
 		// encode blocks' data to json
 		json.NewEncoder(rw).Encode(blockchain.Blockchain().Blocks())
 	case "POST":
-		// make var to store data from user
-		var addBlockBody addBlockBody
-		// get data from body and decode to go value
-		utils.HandleErr(json.NewDecoder(r.Body).Decode(&addBlockBody))
-		data := addBlockBody.Data
-		// add block to blockchain
-		blockchain.Blockchain().AddBlock(data)
+		blockchain.Blockchain().AddBlock()
 		rw.WriteHeader(http.StatusCreated)
 	}
 }
@@ -96,6 +90,10 @@ func block(rw http.ResponseWriter, r *http.Request) {
 	} else {
 		encoder.Encode(block)
 	}
+}
+
+func status(rw http.ResponseWriter, r *http.Request) {
+	json.NewEncoder(rw).Encode(blockchain.Blockchain())
 }
 
 func jsonContentTypeMiddleware(next http.Handler) http.Handler {
@@ -114,6 +112,7 @@ func Start(portNum int) {
 	router.Use(jsonContentTypeMiddleware)
 	// handle routes
 	router.HandleFunc("/", documentation).Methods("GET")
+	router.HandleFunc("/status", status).Methods("GET")
 	router.HandleFunc("/blocks", blocks).Methods("GET", "POST")
 	router.HandleFunc("/blocks/{hash:[a-f0-9]+}", block).Methods("GET")
 	// run server

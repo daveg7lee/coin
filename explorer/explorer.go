@@ -34,11 +34,7 @@ func handleAdd(rw http.ResponseWriter, r *http.Request) {
 	// check request's method
 	switch r.Method {
 	case "POST":
-		// get input value
-		r.ParseForm()
-		data := r.Form.Get("blockData")
-		// add block with data
-		blockchain.Blockchain().AddBlock(data)
+		blockchain.Blockchain().AddBlock()
 		// redirect to home
 		http.Redirect(rw, r, "/", http.StatusPermanentRedirect)
 	case "GET":

@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	defaultDifficulty  int = 2
+	defaultDifficulty  int = 3
 	difficultyInterval int = 5
 	blockInterval      int = 2
 	allowedRange       int = 2
@@ -32,8 +32,8 @@ func (b *blockchain) persist() {
 	db.SaveBlockchain(utils.ToBytes(b))
 }
 
-func (b *blockchain) AddBlock(data string) {
-	block := createBlock(data, b.NewestHash, b.Height+1)
+func (b *blockchain) AddBlock() {
+	block := createBlock(b.NewestHash, b.Height+1)
 	b.NewestHash = block.Hash
 	b.Height = block.Height
 	b.CurrentDifficulty = block.Difficulty
@@ -90,7 +90,7 @@ func Blockchain() *blockchain {
 			checkPoint := db.CheckPoint()
 			if checkPoint == nil {
 				// add genesis block
-				b.AddBlock("Genesis Block!!")
+				b.AddBlock()
 			} else {
 				b.restore(checkPoint)
 			}
