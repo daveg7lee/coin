@@ -5,7 +5,7 @@ http://localhost:4000/blocks
 POST http://localhost:4000/blocks
 
 {
-    "data": "make block"
+    "data": "This Block is Mined"
 }
 
 ###
