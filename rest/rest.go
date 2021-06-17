@@ -74,6 +74,11 @@ func documentation(rw http.ResponseWriter, r *http.Request) {
 			Method:      "GET",
 			Description: "See a Block",
 		},
+		{
+			URL:         url("/mempool"),
+			Method:      "GET",
+			Description: "See a mempool",
+		},
 	}
 	// encode data to JSON and write to response
 	json.NewEncoder(rw).Encode(data)
@@ -127,6 +132,10 @@ func jsonContentTypeMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+func mempool(rw http.ResponseWriter, r *http.Request) {
+	utils.HandleErr(json.NewEncoder(rw).Encode(blockchain.Mempool.Txs))
+}
+
 func Start(portNum int) {
 	// make own handler
 	router := mux.NewRouter()
@@ -140,6 +149,7 @@ func Start(portNum int) {
 	router.HandleFunc("/balance/{address}", balance).Methods("GET")
 	router.HandleFunc("/blocks", blocks).Methods("GET", "POST")
 	router.HandleFunc("/blocks/{hash:[a-f0-9]+}", block).Methods("GET")
+	router.HandleFunc("/mempool}", mempool).Methods("GET")
 	// run server
 	fmt.Printf("REST API is Listening on http://localhost%s\n", port)
 	log.Fatal(http.ListenAndServe(port, router))
