@@ -19,8 +19,8 @@ POST http://localhost:4000/transactions
 
 {
     "to":"joel",
-    "amount":50
+    "amount":25
 }
 
 ###
-http://localhost:4000/balance/dave?total=true
+http://localhost:4000/balance/dave
