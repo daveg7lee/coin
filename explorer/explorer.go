@@ -22,7 +22,7 @@ var templates *template.Template
 // handle '/'
 func handleHome(rw http.ResponseWriter, r *http.Request) {
 	// get all blocks
-	blocks := blockchain.Blockchain().Blocks()
+	blocks := blockchain.Blocks(blockchain.Blockchain())
 	// make data
 	data := homeData{"Home", blocks}
 	// execute template "home" with data
