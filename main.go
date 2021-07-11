@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/daveg7lee/kangaroocoin/cli"
-	"github.com/daveg7lee/kangaroocoin/db"
+	"github.com/daveg7lee/kangaroocoin/wallet"
 )
 
 func main() {
-	cli.Start()
-	db.Close()
+	//cli.Start()
+	//db.Close()
+	wallet.Start()
 }
