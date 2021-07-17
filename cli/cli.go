@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"runtime"
 
 	"github.com/daveg7lee/kangaroocoin/explorer"
 	"github.com/daveg7lee/kangaroocoin/rest"
@@ -16,7 +15,7 @@ func usage() {
 	fmt.Printf("Please use the follow flags:\n\n")
 	fmt.Printf("-port:	Set the PORT of the server (default 4000)\n")
 	fmt.Printf("-mode:	Choose between 'html', 'rest', and 'all' (rest is recommended)\n")
-	runtime.Goexit()
+	os.Exit(0)
 }
 
 // start cli
