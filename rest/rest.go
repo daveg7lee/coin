@@ -8,6 +8,7 @@ import (
 
 	"github.com/daveg7lee/kangaroocoin/blockchain"
 	"github.com/daveg7lee/kangaroocoin/utils"
+	"github.com/daveg7lee/kangaroocoin/wallet"
 	"github.com/gorilla/mux"
 )
 
@@ -42,6 +43,10 @@ type balanceResponse struct {
 type addTxPayload struct {
 	To     string `json:"to"`
 	Amount int    `json:"amount"`
+}
+
+type myWalletResponse struct {
+	Address string `json:"address"`
 }
 
 // handle '/' route
@@ -151,6 +156,11 @@ func transactions(rw http.ResponseWriter, r *http.Request) {
 	rw.WriteHeader(http.StatusCreated)
 }
 
+func myWallet(rw http.ResponseWriter, r *http.Request) {
+	address := wallet.Wallet().Address
+	json.NewEncoder(rw).Encode(myWalletResponse{Address: address})
+}
+
 func Start(portNum int) {
 	// make own handler
 	router := mux.NewRouter()
@@ -165,6 +175,7 @@ func Start(portNum int) {
 	router.HandleFunc("/blocks", blocks).Methods("GET", "POST")
 	router.HandleFunc("/blocks/{hash:[a-f0-9]+}", block).Methods("GET")
 	router.HandleFunc("/mempool", mempool).Methods("GET")
+	router.HandleFunc("/wallet", myWallet).Methods("GET")
 	router.HandleFunc("/transactions", transactions).Methods("POST")
 	// run server
 	fmt.Printf("REST API is Listening on http://localhost%s\n", port)
