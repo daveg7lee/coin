@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/daveg7lee/kangaroocoin/blockchain"
+	"github.com/daveg7lee/kangaroocoin/p2p"
 	"github.com/daveg7lee/kangaroocoin/utils"
 	"github.com/daveg7lee/kangaroocoin/wallet"
 	"github.com/gorilla/mux"
@@ -89,6 +90,16 @@ func documentation(rw http.ResponseWriter, r *http.Request) {
 			Method:      "GET",
 			Description: "See a mempool",
 		},
+		{
+			URL:         url("/wallet"),
+			Method:      "GET",
+			Description: "See a wallet",
+		},
+		{
+			URL:         url("/ws"),
+			Method:      "GET",
+			Description: "Upgrade to WebSockets",
+		},
 	}
 	// encode data to JSON and write to response
 	json.NewEncoder(rw).Encode(data)
@@ -142,6 +153,13 @@ func jsonContentTypeMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+func loggerMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		fmt.Println(r.URL)
+		next.ServeHTTP(rw, r)
+	})
+}
+
 func mempool(rw http.ResponseWriter, r *http.Request) {
 	utils.HandleErr(json.NewEncoder(rw).Encode(blockchain.Mempool.Txs))
 }
@@ -169,7 +187,7 @@ func Start(portNum int) {
 	// init port number
 	port = fmt.Sprintf(":%d", portNum)
 	// use middleware
-	router.Use(jsonContentTypeMiddleware)
+	router.Use(jsonContentTypeMiddleware, loggerMiddleware)
 	// handle routes
 	router.HandleFunc("/", documentation).Methods("GET")
 	router.HandleFunc("/status", status).Methods("GET")
@@ -179,6 +197,7 @@ func Start(portNum int) {
 	router.HandleFunc("/mempool", mempool).Methods("GET")
 	router.HandleFunc("/wallet", myWallet).Methods("GET")
 	router.HandleFunc("/transactions", transactions).Methods("POST")
+	router.HandleFunc("/ws", p2p.Upgrade).Methods("POST")
 	// run server
 	fmt.Printf("REST API is Listening on http://localhost%s\n", port)
 	log.Fatal(http.ListenAndServe(port, router))
