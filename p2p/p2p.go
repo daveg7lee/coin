@@ -18,7 +18,11 @@ func Upgrade(rw http.ResponseWriter, r *http.Request) {
 	utils.HandleErr(err)
 	for {
 		_, payload, err := conn.ReadMessage()
-		utils.HandleErr(err)
-		fmt.Printf("%s\n", payload)
+		if err != nil {
+			break
+		}
+		fmt.Printf("Just got: %s\n", payload)
+		message := fmt.Sprintf("We also think that: %s\n", payload)
+		utils.HandleErr(conn.WriteMessage(websocket.TextMessage, []byte(message)))
 	}
 }
