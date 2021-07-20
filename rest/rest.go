@@ -197,7 +197,7 @@ func Start(portNum int) {
 	router.HandleFunc("/mempool", mempool).Methods("GET")
 	router.HandleFunc("/wallet", myWallet).Methods("GET")
 	router.HandleFunc("/transactions", transactions).Methods("POST")
-	router.HandleFunc("/ws", p2p.Upgrade).Methods("POST")
+	router.HandleFunc("/ws", p2p.Upgrade).Methods("GET")
 	// run server
 	fmt.Printf("REST API is Listening on http://localhost%s\n", port)
 	log.Fatal(http.ListenAndServe(port, router))

@@ -8,7 +8,10 @@
 </head>
 <body>
     <script>
-        const socket = new WebSocket("ws://localhost:4000/ws")
+        const socket = new WebSocket("ws://localhost:3000/ws");
+        setTimeout(() => {
+            socket.send("Hello it's JS")
+        }, 3000)
     </script>
 </body>
 </html>
