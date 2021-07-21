@@ -50,6 +50,10 @@ type myWalletResponse struct {
 	Address string `json:"address"`
 }
 
+type addPeerPayload struct {
+	address, port string
+}
+
 // handle '/' route
 func documentation(rw http.ResponseWriter, r *http.Request) {
 	// make description of route '/'
@@ -181,6 +185,16 @@ func myWallet(rw http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(rw).Encode(myWalletResponse{Address: address})
 }
 
+func peers(rw http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "POST":
+		var payload addPeerPayload
+		json.NewDecoder(r.Body).Decode(&payload)
+		p2p.AddPeer(payload.address, payload.port)
+		rw.WriteHeader(http.StatusOK)
+	}
+}
+
 func Start(portNum int) {
 	// make own handler
 	router := mux.NewRouter()
@@ -198,6 +212,7 @@ func Start(portNum int) {
 	router.HandleFunc("/wallet", myWallet).Methods("GET")
 	router.HandleFunc("/transactions", transactions).Methods("POST")
 	router.HandleFunc("/ws", p2p.Upgrade).Methods("GET")
+	router.HandleFunc("/peers", p2p.Upgrade).Methods("POST")
 	// run server
 	fmt.Printf("REST API is Listening on http://localhost%s\n", port)
 	log.Fatal(http.ListenAndServe(port, router))

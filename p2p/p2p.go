@@ -1,13 +1,13 @@
 package p2p
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/daveg7lee/kangaroocoin/utils"
 	"github.com/gorilla/websocket"
 )
 
-var conns []*websocket.Conn
 var upgrader = websocket.Upgrader{}
 
 func Upgrade(rw http.ResponseWriter, r *http.Request) {
@@ -15,17 +15,10 @@ func Upgrade(rw http.ResponseWriter, r *http.Request) {
 		return true
 	}
 	conn, err := upgrader.Upgrade(rw, r, nil)
-	conns = append(conns, conn)
 	utils.HandleErr(err)
-	for {
-		_, payload, err := conn.ReadMessage()
-		if err != nil {
-			break
-		}
-		for _, aConn := range conns {
-			if aConn != conn {
-				utils.HandleErr(aConn.WriteMessage(websocket.TextMessage, payload))
-			}
-		}
-	}
+}
+
+func AddPeer(address, port string) {
+	conn, _, err := websocket.DefaultDialer.Dial(fmt.Sprintf("ws://%s:%s/ws", address, port), nil)
+	utils.HandleErr(err)
 }
