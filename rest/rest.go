@@ -51,7 +51,7 @@ type myWalletResponse struct {
 }
 
 type addPeerPayload struct {
-	address, port string
+	Address, Port string
 }
 
 // handle '/' route
@@ -190,8 +190,10 @@ func peers(rw http.ResponseWriter, r *http.Request) {
 	case "POST":
 		var payload addPeerPayload
 		json.NewDecoder(r.Body).Decode(&payload)
-		p2p.AddPeer(payload.address, payload.port)
+		p2p.AddPeer(payload.Address, payload.Port)
 		rw.WriteHeader(http.StatusOK)
+	case "GET":
+		json.NewEncoder(rw).Encode(p2p.Peers)
 	}
 }
 
@@ -212,7 +214,7 @@ func Start(portNum int) {
 	router.HandleFunc("/wallet", myWallet).Methods("GET")
 	router.HandleFunc("/transactions", transactions).Methods("POST")
 	router.HandleFunc("/ws", p2p.Upgrade).Methods("GET")
-	router.HandleFunc("/peers", p2p.Upgrade).Methods("POST")
+	router.HandleFunc("/peers", peers).Methods("POST", "GET")
 	// run server
 	fmt.Printf("REST API is Listening on http://localhost%s\n", port)
 	log.Fatal(http.ListenAndServe(port, router))
