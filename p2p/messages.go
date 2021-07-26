@@ -2,7 +2,6 @@ package p2p
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/daveg7lee/kangaroocoin/blockchain"
 	"github.com/daveg7lee/kangaroocoin/utils"
@@ -12,7 +11,7 @@ type MessageKind int
 
 const (
 	NewestBlockMessage MessageKind = iota
-	AllBlockRequestMessage
+	AllBlocksRequestMessage
 	AllBlockResponseMessage
 )
 
@@ -36,11 +35,33 @@ func sendNewestBlock(p *peer) {
 	p.inbox <- m
 }
 
+func requestAllBlocks(p *peer) {
+	m := makeMessage(AllBlocksRequestMessage, nil)
+	p.inbox <- m
+}
+
+func sendAllBlocks(p *peer) {
+	m := makeMessage(AllBlockResponseMessage, blockchain.Blocks(blockchain.Blockchain()))
+	p.inbox <- m
+}
+
 func handleMsg(m *Message, p *peer) {
 	switch m.Kind {
 	case NewestBlockMessage:
 		var payload blockchain.Block
 		json.Unmarshal(m.Payload, &payload)
-		fmt.Println(payload)
+		b, err := blockchain.FindBlock(blockchain.Blockchain().NewestHash)
+		utils.HandleErr(err)
+		if payload.Height >= b.Height {
+			requestAllBlocks(p)
+		} else {
+			sendNewestBlock(p)
+		}
+	case AllBlocksRequestMessage:
+		sendAllBlocks(p)
+	case AllBlockResponseMessage:
+		var payload []*blockchain.Block
+		err := json.Unmarshal(m.Payload, &payload)
+		utils.HandleErr(err)
 	}
 }
