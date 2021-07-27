@@ -69,10 +69,12 @@ func handleMsg(m *Message, p *peer) {
 	case AllBlockResponseMessage:
 		fmt.Printf("Received all the blocks from %s\n", p.key)
 		var payload []*blockchain.Block
-		err := json.Unmarshal(m.Payload, &payload)
-		utils.HandleErr(err)
+		utils.HandleErr(json.Unmarshal(m.Payload, &payload))
 		blockchain.Blockchain().Replace(payload)
 	case NewBlockNotifyMessage:
+		var payload *blockchain.Block
+		utils.HandleErr(json.Unmarshal(m.Payload, &payload))
+		blockchain.Blockchain().AddPeerBlock(payload)
 	}
 }
 
