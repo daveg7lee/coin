@@ -3,6 +3,7 @@ package db
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/daveg7lee/kangaroocoin/utils"
 	bolt "go.etcd.io/bbolt"
@@ -18,7 +19,12 @@ const (
 var db *bolt.DB
 
 func getDBName() string {
-	port := os.Args[1][6:]
+	var port string
+	for _, i := range os.Args {
+		if strings.Contains(i, "port") {
+			port = i[6:]
+		}
+	}
 	return fmt.Sprintf("%s_%s.db", dbName, port)
 }
 
