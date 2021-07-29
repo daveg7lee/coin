@@ -16,6 +16,7 @@ const (
 	AllBlockResponseMessage
 	NewBlockNotifyMessage
 	NewTxNotifyMessage
+	NewPeerNotifyMessage
 )
 
 type Message struct {
@@ -80,6 +81,10 @@ func handleMsg(m *Message, p *peer) {
 		var payload *blockchain.Tx
 		utils.HandleErr(json.Unmarshal(m.Payload, &payload))
 		blockchain.Mempool().AddPeerTx(payload)
+	case NewPeerNotifyMessage:
+		var payload string
+		utils.HandleErr(json.Unmarshal(m.Payload, &payload))
+		fmt.Printf("I will now /ws upgrade %s", payload)
 	}
 }
 
@@ -90,5 +95,10 @@ func notifyNewBlock(b *blockchain.Block, p *peer) {
 
 func notifyNewTx(tx *blockchain.Tx, p *peer) {
 	m := makeMessage(NewTxNotifyMessage, tx)
+	p.inbox <- m
+}
+
+func notifyNewPeer(address string, p *peer) {
+	m := makeMessage(NewPeerNotifyMessage, address)
 	p.inbox <- m
 }

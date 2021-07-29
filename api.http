@@ -26,12 +26,12 @@ POST http://localhost:3000/transactions
 http://localhost:4000/balance/b4ed437b526a6198161f632cf163eec3a0ae56a31f82059154bb71219c48085a2a80c107acbedd1131ab0dbab76ae703ae6087a8f589f9c94c1eebfc80c8a2cd
 
 ### 
-POST http://localhost:4000/peers
+POST http://localhost:3000/peers
 
 {
     "address": "127.0.0.1",
-    "port": "3000"
+    "port": "2000"
 }
 
 ###
-http://localhost:4000/peers
+http://localhost:2000/peers
